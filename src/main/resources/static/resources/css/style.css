@@ -1,0 +1,83 @@
+@import url('common.css');
+
+.loader {
+    border: 16px solid #f3f3f3;
+    border-top: 16px solid #75cbc6;
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    animation: spin 2s linear infinite;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+@keyframes spin {
+    0% {
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+    100% {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
+
+.container {
+    width: 990px;
+    margin: 0 auto;
+    height: inherit;
+}
+
+.loginDivWrap {
+    position: relative;
+    border: 1px solid #222;
+    width: 800px;
+    height: 400px;
+    margin-top: -200px;
+    top: 50%;
+}
+.loginDiv {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 400px;
+    height: 160px;
+    margin-left: -200px;
+    margin-top: -80px;
+}
+.loginDiv input {
+    width: 100%;
+}
+button[type='submit'] {
+    background-color: #222;
+    border: 1px solid #222;
+    font-size: 11px;
+    padding: 15px;
+    margin-top: 5px;
+    width: 100%;
+    color: #fff;
+}
+
+.chatUl {
+    overflow: hidden;
+}
+.chatUl li {
+    border: 1px solid #e4e4e4;
+    padding: 20px;
+}
+
+.chatUl li.left {
+    float: left;
+}
+
+.chatUl li.right {
+    float: right;
+    text-align: right;
+}
+
+.chatUl::after,
+.chatUl li::after {
+    content: '';
+    display: block;
+    clear: both;
+}
