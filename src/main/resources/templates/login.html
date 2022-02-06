@@ -6,9 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link rel="stylesheet" th:href="@{/resources/css/style.css}"/>
     <title>로그인</title>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
         function fnValidator() {
-            if(document.getElementById('nickname').value === '') {
+            if($('#nickname').val() === '') {
                 alert('닉네임을 입력하세요.');
                 return false;
             }

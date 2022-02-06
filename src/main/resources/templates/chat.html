@@ -4,81 +4,117 @@
     <meta charset="UTF-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <link rel="stylesheet" href="../static/resources/css/style.css"/>
+    <link rel="stylesheet" th:href="@{/resources/css/style.css}"/>
     <title>채팅</title>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+
+        let ws;
+
+        window.onload = openSocket;
+
+        function openSocket() {
+            if (ws !== undefined && ws.readyState !== WebSocket.CLOSED) {
+                alert('웹소켓 서버에 접속하는 과정에서 오류가 발생했습니다.\n로그인 페이지로 이동합니다.');
+                location.href = '/logout.do';
+            }
+
+            ws = new WebSocket("ws://localhost:8080/echo.do");
+
+            //소켓 열림
+            ws.onopen = (event) => {
+                if (event.data === undefined) {
+                    return;
+                }
+                printResponse(event.data);
+            };
+
+            //소켓 메시지 출력
+            ws.onmessage = (event) => {
+                printResponse(event.data);
+            };
+
+            //소켓 닫힘
+            ws.onclose = (event) => {
+                alert('웹소켓 서버와 접속이 종료되었습니다.\n로그인 페이지로 이동합니다.');
+                location.href = '/logout.do';
+            };
+
+            //오류 발생
+            ws.onerror = (event) => {
+                alert('웹소켓 서버에 접속하는 과정에서 오류가 발생했습니다.\n로그인 페이지로 이동합니다.');
+                location.href = '/logout.do';
+            };
+
+        }
+
+        //채팅방 나가기
+        function closeSocket() {
+            if (ws !== undefined && ws.readyState !== WebSocket.CLOSED) {
+                ws.close();
+            }
+            location.href = '/logout.do';
+        }
+
+        //전송
+        function fnSend() {
+            let nickname = $('#nickname').val();
+            let message = $('#message').val();
+            let data = {'nickname': nickname, 'message': message};
+            let json = JSON.stringify(data);
+
+            ws.send(json);
+            $('#message').val('');
+        }
+
+        //서버로부터 받은 내용 출력
+        function printResponse(data) {
+
+            let object = JSON.parse(data);
+            let type;
+
+            console.log(object);
+
+            if (object.returnCode === '1') {
+                type = 'right';
+            }
+            else if (object.returnCode === '2') {
+                type = 'left';
+            }
+            else {
+                type = 'notify';
+            }
+
+            if (type === 'notify') {
+                $('#chatList').append("<div class=\"notify\">" + object.message + "</div>");
+            }
+            else {
+                $('#chatList').append("<li class=\"" + type + "\">" +
+                    "<span class=\"name\">" + object.sender + "</span>" +
+                    "<div>" +
+                    "<p>" + object.message + "</p>" +
+                    "</div>" +
+                    "<span class=\"time\">" + object.timeFormatted + "</span>" +
+                    "</li>");
+            }
+        }
+
+
+    </script>
 </head>
 <body>
 <div class="loader" style="display: none"></div>
 <div class="container">
     <div class="exit">
-        <button>채팅방 나가기</button>
+        <button onclick="closeSocket();">채팅방 나가기</button>
     </div>
     <div class="chatBox">
-        <ul class="chatUl">
-            <li class="left">
-                <span class="name">사용자</span>
-                <div>
-                    <p>testtesttesttesttesttesttesttesttesttest</p>
-                </div>
-                <span class="time">1:50</span>
-            </li>
-            <li class="right">
-                <span class="time">1:50</span>
-                <div>
-                    <p>testtesttesttesttesttesttesttesttesttest
-                        testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest
-                        testtesttesttesttesttesttesttesttesttest</p>
-                </div>
-            </li>
-            <li class="right">
-                <span class="time">1:50</span>
-                <div>
-                    <p>testtesttesttesttesttesttesttesttesttest</p>
-                </div>
-            </li>
-            <li class="right">
-                <span class="time">1:50</span>
-                <div>
-                    <p>testtesttesttesttesttesttesttesttesttest</p>
-                </div>
-            </li>
-            <li class="right">
-                <span class="time">1:50</span>
-                <div>
-                    <p>testtesttesttesttesttesttesttesttesttest</p>
-                </div>
-            </li>
-            <li class="left">
-                <span class="name">사용자</span>
-                <div>
-                    <p>testtesttesttesttesttesttesttesttesttest</p>
-                </div>
-                <span class="time">1:50</span>
-            </li>
-        </ul>
-        <div class="notify">사용자님이 들어왔습니다</div>
-        <ul class="chatUl">
-            <li class="left">
-                <span class="name">사용자</span>
-                <div>
-                    <p>testtesttesttesttesttesttesttesttesttest</p>
-                </div>
-                <span class="time">1:50</span>
-            </li>
-        </ul>
-        <div class="notify">사용자님이 나갔습니다</div>
-        <ul class="chatUl">
-            <li class="right">
-                <span class="time">1:50</span>
-                <div>
-                    <p>testtesttesttesttesttesttesttesttesttest</p>
-                </div>
-            </li>
-        </ul>
+        <ul class="chatUl" id="chatList"></ul>
     </div>
     <div class="write">
-        <textarea name="" id="" cols="30" rows="10"></textarea>
-        <button>전송</button>
+        <input type="hidden" th:attr="id='nickname'" th:value="${session.nickname}"/>
+        <textarea id="message" cols="30" rows="10"></textarea>
+        <button onclick="fnSend();">전송</button>
     </div>
 </div>
 </body>
