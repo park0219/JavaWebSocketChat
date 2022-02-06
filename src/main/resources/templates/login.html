@@ -1,18 +1,26 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="https://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <link rel="stylesheet" href="../static/resources/css/style.css"/>
+    <link rel="stylesheet" th:href="@{/resources/css/style.css}"/>
     <title>로그인</title>
+    <script>
+        function fnValidator() {
+            if(document.getElementById('nickname').value === '') {
+                alert('닉네임을 입력하세요.');
+                return false;
+            }
+        }
+    </script>
 </head>
 <body>
 <div class="loader" style="display: none"></div>
 <div class="container loginDivWrap">
     <div class="loginDiv">
         <p>로그인 페이지 입니다.</p>
-        <form action="" method="post">
+        <form action="/loginProcess.do" method="post" onsubmit="return fnValidator();">
             <input type="text" name="nickname" id="nickname" placeholder="닉네임을 입력하세요."/>
             <button type="submit">채팅 시작하기</button>
         </form>
