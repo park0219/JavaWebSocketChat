@@ -19,15 +19,27 @@ public class LoginController {
         return "login";
     }
 
-    @RequestMapping(value = "/loginProcess.do")
-    public String loginProcess(@RequestParam String id, HttpServletRequest request, HttpServletResponse response) {
+    @RequestMapping(value = "/loginProcess.do", method = RequestMethod.POST)
+    public String loginProcess(@RequestParam String nickname, HttpServletRequest request, HttpServletResponse response) {
 
-        log.info("Welcome " + id);
+        log.info("\"" + nickname + "\" Enter");
 
         HttpSession session = request.getSession();
-        session.setAttribute("id", id);
+        session.setAttribute("nickname", nickname);
+
         return "chat";
     }
 
+    @RequestMapping(value = "/logout.do", method = RequestMethod.GET)
+    public String logout(HttpServletRequest request, HttpServletResponse response) {
+
+        HttpSession session = request.getSession();
+
+        log.info("\"" + session.getAttribute("nickname") + "\" Leave");
+
+        session.removeAttribute("nickname");
+
+        return "forward:/login.do";
+    }
 
 }
