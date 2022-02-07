@@ -58,9 +58,8 @@
 
         //전송
         function fnSend() {
-            let nickname = $('#nickname').val();
             let message = $('#message').val();
-            let data = {'nickname': nickname, 'message': message};
+            let data = {'message': message};
             let json = JSON.stringify(data);
 
             ws.send(json);
@@ -112,7 +111,6 @@
         <ul class="chatUl" id="chatList"></ul>
     </div>
     <div class="write">
-        <input type="hidden" th:attr="id='nickname'" th:value="${session.nickname}"/>
         <textarea id="message" cols="30" rows="10"></textarea>
         <button onclick="fnSend();">전송</button>
     </div>
