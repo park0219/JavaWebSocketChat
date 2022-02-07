@@ -10,6 +10,7 @@
     <script>
 
         let ws;
+        let lastUlFlag = false;
 
         $(document).ready(() => {
             //웹소켓 접속
@@ -109,16 +110,31 @@
             }
 
             if (type === 'notify') {
-                $('#chatList').append("<div class=\"notify\">" + object.message + "</div>");
+                $('#chatContainer').append("<div class=\"notify\">" + object.message + "</div>");
+                lastUlFlag = false;
             }
             else {
-                $('#chatList').append("<li class=\"" + type + "\">" +
-                    "<span class=\"name\">" + object.sender + "</span>" +
-                    "<div>" +
-                    "<p>" + object.message + "</p>" +
-                    "</div>" +
-                    "<span class=\"time\">" + object.timeFormatted + "</span>" +
-                    "</li>");
+                if(lastUlFlag === false) {
+                    $('#chatContainer').append("<ul class=\"chatUl\">" +
+                        "<li class=\"" + type + "\">" +
+                        "<span class=\"name\">" + object.sender + "</span>" +
+                        "<div>" +
+                        "<p>" + object.message + "</p>" +
+                        "</div>" +
+                        "<span class=\"time\">" + object.timeFormatted + "</span>" +
+                        "</li>" +
+                        "</ul>");
+                }
+                else {
+                    $('.chatUl').last().append("<li class=\"" + type + "\">" +
+                        "<span class=\"name\">" + object.sender + "</span>" +
+                        "<div>" +
+                        "<p>" + object.message + "</p>" +
+                        "</div>" +
+                        "<span class=\"time\">" + object.timeFormatted + "</span>" +
+                        "</li>");
+                }
+                lastUlFlag = true;
             }
 
             //자동 스크롤
@@ -133,7 +149,7 @@
         <button onclick="closeSocket();">채팅방 나가기</button>
     </div>
     <div class="chatBox" id="chatContainer">
-        <ul class="chatUl" id="chatList"></ul>
+        <ul class="chatUl"></ul>
     </div>
     <div class="write">
         <textarea id="message" cols="30" rows="10"></textarea>
