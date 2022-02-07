@@ -2,6 +2,7 @@ package me.park.javawebsocketchat;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,14 +21,19 @@ public class LoginController {
     }
 
     @RequestMapping(value = "/loginProcess.do", method = RequestMethod.POST)
-    public String loginProcess(@RequestParam String nickname, HttpServletRequest request, HttpServletResponse response) {
+    public String loginProcess(@RequestParam String nickname, HttpServletRequest request, HttpServletResponse response, Model model) {
+
+        if(nickname == null || nickname.equals("")) {
+            model.addAttribute("message", new Message("닉네임은 한 글자 이상 입력해주세요.", "/logout.do"));
+            return "message";
+        }
 
         log.info("\"" + nickname + "\" Enter");
 
         HttpSession session = request.getSession();
         session.setAttribute("nickname", nickname);
 
-        return "chat";
+        return "redirect:/chat.do";
     }
 
     @RequestMapping(value = "/logout.do", method = RequestMethod.GET)
