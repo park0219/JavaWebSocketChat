@@ -58,6 +58,7 @@ public class WebSocketChat {
         HttpSession httpSession = (HttpSession) config.getUserProperties().get(HttpSessionConfigurator.Session);
 
         Map<String, String> jsonMap = gson.fromJson(message, Map.class);
+        jsonMap.put("message", ConvertInputValue(jsonMap.get("message")));
 
         log.info("Message From \"" + httpSession.getAttribute("nickname") + "\": " + jsonMap.get("message"));
 
@@ -119,5 +120,11 @@ public class WebSocketChat {
             }
         });
 
+    }
+
+    public static String ConvertInputValue(String message) {
+        message = message.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;")
+                .replace("'", "&apos;").replace("\\", "&#x2F;").replace(" ", "&nbsp;").replace("\n", "<br />");
+        return message;
     }
 }
