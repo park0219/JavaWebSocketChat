@@ -77,6 +77,7 @@ public class WebSocketChat {
         catch(Exception e) {
             log.info("WebSocketChat.onMessage ERROR: " + e.getMessage());
         }
+        returnMap.put("returnCode", "2");
         sendAllSessionMessage(session, returnMap);
     }
 
@@ -91,13 +92,18 @@ public class WebSocketChat {
         EndpointConfig config = sessionConfigMap.get(session);
         HttpSession httpSession = (HttpSession) config.getUserProperties().get(HttpSessionConfigurator.Session);
 
-        log.info("Session " + session.getId() + "(" + httpSession.getAttribute("nickname") + ")" + " has closed");
-        returnMap.put("returnCode", "3");
-        returnMap.put("message", httpSession.getAttribute("nickname") + "님이 나갔습니다");
-        sendAllSessionMessage(session, returnMap);
+        if(httpSession != null) {
+            log.info("Session " + session.getId() + "(" + httpSession.getAttribute("nickname") + ")" + " has closed");
+            returnMap.put("message", httpSession.getAttribute("nickname") + "님이 나갔습니다");
+            returnMap.put("returnCode", "3");
+            sendAllSessionMessage(session, returnMap);
+            httpSession.removeAttribute("nickname");
+        }
+        else {
+            log.info("Session " + session.getId() + " has closed");
+        }
         sessionConfigMap.remove(session);
 
-        httpSession.removeAttribute("nickname");
     }
 
     private void sendAllSessionMessage(Session self, Map<String, Object> returnMap) {
