@@ -11,7 +11,27 @@
 
         let ws;
 
-        window.onload = openSocket;
+        $(document).ready(() => {
+            //웹소켓 접속
+            openSocket();
+
+            $('#message').on('keyup', (event) => {
+
+                if(event.key === 'Enter') {
+                    if(!event.shiftKey) {
+                        fnSend();
+                    }
+                }
+
+                if($('#message').val().trim() !== '') {
+                    $('#sendButton').attr('disabled', false);
+                }
+                else {
+                    $('#sendButton').attr('disabled', true);
+                }
+
+            });
+        });
 
         function openSocket() {
             if (ws !== undefined && ws.readyState !== WebSocket.CLOSED) {
@@ -58,11 +78,17 @@
 
         //전송
         function fnSend() {
-            let message = $('#message').val();
+            let message = $('#message').val().trim();
+            if(message === '') {
+                $('#message').val('');
+                $('#sendButton').attr('disabled', true);
+                return false;
+            }
             let data = {'message': message};
             let json = JSON.stringify(data);
 
             ws.send(json);
+            $('#sendButton').attr('disabled', true);
             $('#message').val('');
         }
 
@@ -71,8 +97,6 @@
 
             let object = JSON.parse(data);
             let type;
-
-            console.log(object);
 
             if (object.returnCode === '1') {
                 type = 'right';
@@ -96,9 +120,10 @@
                     "<span class=\"time\">" + object.timeFormatted + "</span>" +
                     "</li>");
             }
+
+            //자동 스크롤
+            $('#chatContainer').scrollTop($('#chatContainer')[0].scrollHeight);
         }
-
-
     </script>
 </head>
 <body>
@@ -107,12 +132,12 @@
     <div class="exit">
         <button onclick="closeSocket();">채팅방 나가기</button>
     </div>
-    <div class="chatBox">
+    <div class="chatBox" id="chatContainer">
         <ul class="chatUl" id="chatList"></ul>
     </div>
     <div class="write">
         <textarea id="message" cols="30" rows="10"></textarea>
-        <button onclick="fnSend();">전송</button>
+        <button id="sendButton" onclick="fnSend();" disabled>전송</button>
     </div>
 </div>
 </body>
