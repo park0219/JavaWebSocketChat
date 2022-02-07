@@ -39,7 +39,7 @@ public class LoginController {
 
         session.removeAttribute("nickname");
 
-        return "forward:/login.do";
+        return "redirect:/login.do";
     }
 
 }
