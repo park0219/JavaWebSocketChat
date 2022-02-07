@@ -18,13 +18,13 @@
 
             $('#message').on('keyup', (event) => {
 
-                if(event.key === 'Enter') {
-                    if(!event.shiftKey) {
+                if (event.key === 'Enter') {
+                    if (!event.shiftKey) {
                         fnSend();
                     }
                 }
 
-                if($('#message').val().trim() !== '') {
+                if ($('#message').val().trim() !== '') {
                     $('#sendButton').attr('disabled', false);
                 }
                 else {
@@ -80,7 +80,7 @@
         //전송
         function fnSend() {
             let message = $('#message').val().trim();
-            if(message === '') {
+            if (message === '') {
                 $('#message').val('');
                 $('#sendButton').attr('disabled', true);
                 return false;
@@ -98,41 +98,40 @@
 
             let object = JSON.parse(data);
             let type;
+            let li = '';
 
             if (object.returnCode === '1') {
                 type = 'right';
+                li += "<li class=\"" + type + "\">" +
+                    "<span class=\"name\">" + object.sender + "</span>" +
+                    "<span class=\"time\">" + object.timeFormatted + "</span>" +
+                    "<div>" +
+                    "<p>" + object.message + "</p>" +
+                    "</div>" +
+                    "</li>";
             }
             else if (object.returnCode === '2') {
                 type = 'left';
+                li += "<li class=\"" + type + "\">" +
+                    "<span class=\"name\">" + object.sender + "</span>" +
+                    "<div>" +
+                    "<p>" + object.message + "</p>" +
+                    "</div>" +
+                    "<span class=\"time\">" + object.timeFormatted + "</span>" +
+                    "</li>";
             }
             else {
                 type = 'notify';
-            }
-
-            if (type === 'notify') {
                 $('#chatContainer').append("<div class=\"notify\">" + object.message + "</div>");
                 lastUlFlag = false;
             }
-            else {
-                if(lastUlFlag === false) {
-                    $('#chatContainer').append("<ul class=\"chatUl\">" +
-                        "<li class=\"" + type + "\">" +
-                        "<span class=\"name\">" + object.sender + "</span>" +
-                        "<div>" +
-                        "<p>" + object.message + "</p>" +
-                        "</div>" +
-                        "<span class=\"time\">" + object.timeFormatted + "</span>" +
-                        "</li>" +
-                        "</ul>");
+
+            if (type !== 'notify') {
+                if (lastUlFlag === false) {
+                    $('#chatContainer').append("<ul class=\"chatUl\">" + li + "</ul>");
                 }
                 else {
-                    $('.chatUl').last().append("<li class=\"" + type + "\">" +
-                        "<span class=\"name\">" + object.sender + "</span>" +
-                        "<div>" +
-                        "<p>" + object.message + "</p>" +
-                        "</div>" +
-                        "<span class=\"time\">" + object.timeFormatted + "</span>" +
-                        "</li>");
+                    $('.chatUl').last().append(li);
                 }
                 lastUlFlag = true;
             }
