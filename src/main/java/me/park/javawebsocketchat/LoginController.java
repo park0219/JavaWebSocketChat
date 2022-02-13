@@ -28,10 +28,12 @@ public class LoginController {
             return "message";
         }
 
-        log.info("\"" + nickname + "\" Enter");
+        String ip = (null != request.getHeader("X-FORWARDED-FOR")) ? request.getHeader("X-FORWARDED-FOR") : request.getRemoteAddr();
+        log.info("\"" + nickname + "\"(" + ip + ") Enter");
 
         HttpSession session = request.getSession();
         session.setAttribute("nickname", nickname);
+        session.setAttribute("ip", ip);
 
         return "redirect:/chat.do";
     }
