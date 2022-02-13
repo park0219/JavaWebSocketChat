@@ -10,25 +10,30 @@ import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @Component
-@ServerEndpoint(value = "/echo.do", configurator = HttpSessionConfigurator.class)
+@ServerEndpoint(value = "/echo.do", configurator = WebSocketConfigurator.class)
 public class WebSocketChat {
+
+    private final ChatRepository chatRepository;
 
     private static final Map<Session, EndpointConfig> sessionConfigMap = Collections.synchronizedMap(new HashMap<>());
     private final Gson gson = new Gson();
     private final Map<String, Object> returnMap = new HashMap<>();
 
-    public WebSocketChat() {
+    public WebSocketChat(ChatRepository chatRepository) {
         log.info("웹소켓 객체 생성");
+        this.chatRepository = chatRepository;
     }
 
     @OnOpen
     public void onOpen(Session session, EndpointConfig config) {
 
-        HttpSession httpSession = (HttpSession) config.getUserProperties().get(HttpSessionConfigurator.Session);
+        HttpSession httpSession = (HttpSession) config.getUserProperties().get(WebSocketConfigurator.Session);
 
         log.info("WebSocketChat.onOpen: user enter => " + session.getId() + "(" + httpSession.getAttribute("nickname") + ")");
         try {
@@ -37,6 +42,16 @@ public class WebSocketChat {
             returnMap.put("message", "채팅방에 연결되었습니다.");
             returnMap.put("returnCode", "3");
             basic.sendText(gson.toJson(returnMap));
+
+            //DB에 저장
+            ChatEntity chat = ChatEntity.builder()
+                    .chatType('2')
+                    .chatMessage(httpSession.getAttribute("nickname") + "님이 들어왔습니다")
+                    .nickname("관리자")
+                    .ip(httpSession.getAttribute("ip").toString())
+                    .chatRegdate(LocalDateTime.now())
+                    .build();
+            chatRepository.save(chat);
 
             returnMap.put("message", httpSession.getAttribute("nickname") + "님이 들어왔습니다");
             sendAllSessionMessage(session, returnMap);
@@ -55,7 +70,7 @@ public class WebSocketChat {
     public void onMessage(String message, Session session) {
 
         EndpointConfig config = sessionConfigMap.get(session);
-        HttpSession httpSession = (HttpSession) config.getUserProperties().get(HttpSessionConfigurator.Session);
+        HttpSession httpSession = (HttpSession) config.getUserProperties().get(WebSocketConfigurator.Session);
 
         Map<String, String> jsonMap = gson.fromJson(message, Map.class);
         jsonMap.put("message", ConvertInputValue(jsonMap.get("message")));
@@ -70,6 +85,16 @@ public class WebSocketChat {
         returnMap.put("message", jsonMap.get("message"));
         returnMap.put("time", now.format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일 HH시 mm분 ss초")));
         returnMap.put("timeFormatted", now.format(DateTimeFormatter.ofPattern("HH:mm")));
+
+        //DB에 저장
+        ChatEntity chat = ChatEntity.builder()
+                .chatType('1')
+                .chatMessage(jsonMap.get("message"))
+                .nickname(httpSession.getAttribute("nickname").toString())
+                .ip(httpSession.getAttribute("ip").toString())
+                .chatRegdate(now)
+                .build();
+        chatRepository.save(chat);
 
         try {
             RemoteEndpoint.Basic basic = session.getBasicRemote();
@@ -91,10 +116,21 @@ public class WebSocketChat {
     public void onClose(Session session) {
 
         EndpointConfig config = sessionConfigMap.get(session);
-        HttpSession httpSession = (HttpSession) config.getUserProperties().get(HttpSessionConfigurator.Session);
+        HttpSession httpSession = (HttpSession) config.getUserProperties().get(WebSocketConfigurator.Session);
 
         if(httpSession != null) {
             log.info("Session " + session.getId() + "(" + httpSession.getAttribute("nickname") + ")" + " has closed");
+
+            //DB에 저장
+            ChatEntity chat = ChatEntity.builder()
+                    .chatType('2')
+                    .chatMessage(httpSession.getAttribute("nickname") + "님이 나갔습니다")
+                    .nickname("관리자")
+                    .ip(httpSession.getAttribute("ip").toString())
+                    .chatRegdate(LocalDateTime.now())
+                    .build();
+            chatRepository.save(chat);
+
             returnMap.put("message", httpSession.getAttribute("nickname") + "님이 나갔습니다");
             returnMap.put("returnCode", "3");
             sendAllSessionMessage(session, returnMap);
