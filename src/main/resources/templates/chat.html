@@ -7,12 +7,16 @@
     <link rel="stylesheet" th:href="@{/resources/css/style.css}"/>
     <title>채팅</title>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script>
+    <script th:inline="javascript">
 
         let ws;
         let lastUlFlag = false;
+        let prevDataList = /*[[${chatList}]]*/ '';
 
         $(document).ready(() => {
+
+            //기존 데이터 출력
+            printPrevData();
             //웹소켓 접속
             openSocket();
             getNotificationPermission();
@@ -92,6 +96,44 @@
             ws.send(json);
             $('#sendButton').attr('disabled', true);
             $('#message').val('');
+        }
+
+        //기존 데이터 출력
+        function printPrevData() {
+            if (prevDataList === '[]') {
+                return;
+            }
+
+            $('#chatContainer').append("<div class=\"notify\">" + "이전 채팅내용 시작 지점입니다." + "</div>");
+
+            let jsonList = JSON.parse(prevDataList);
+            let lastUlFlag = false;
+            jsonList.forEach((data, index) => {
+
+                if (data.chatType === '1') {
+                    let li = "<li class=\"left\">" +
+                        "<span class=\"name\">" + data.nickname + "</span>" +
+                        "<div>" +
+                        "<p>" + data.chatMessage + "</p>" +
+                        "</div>" +
+                        "<span class=\"time\">" + data.chatRegdate.time.hour + ":" + data.chatRegdate.time.minute + "</span>" +
+                        "</li>";
+                    if (lastUlFlag === false) {
+                        $('#chatContainer').append("<ul class=\"chatUl\">" + li + "</ul>");
+                    }
+                    else {
+                        $('.chatUl').last().append(li);
+                    }
+                    lastUlFlag = true;
+                }
+                else {
+                    $('#chatContainer').append("<div class=\"notify\">" + data.chatMessage + "</div>");
+                    lastUlFlag = false;
+                }
+
+            });
+
+            $('#chatContainer').append("<div class=\"notify\">" + "이전 채팅내용 끝 지점입니다." + "</div>");
         }
 
         //서버로부터 받은 내용 출력
