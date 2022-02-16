@@ -83,7 +83,7 @@
 }
 
 .chatUl li {
-    width: 51%;
+    width: 60%;
     margin-top: 10px;
 }
 
@@ -197,13 +197,16 @@
     }
 
     .chatUl li {
-        max-width: 80%;
-        width: auto;
+        width: 65%;
     }
 }
 
 @media screen and (max-width: 425px) {
     .loginDivWrap {
         padding: 40px 20px;
+    }
+
+    .chatUl li {
+        width: 70%;
     }
 }
