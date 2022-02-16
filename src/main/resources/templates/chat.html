@@ -21,7 +21,7 @@
             openSocket();
             getNotificationPermission();
 
-            $('#message').on('keyup', (event) => {
+            $('#message').bind('keyup input', (event) => {
 
                 if (event.key === 'Enter') {
                     if (!event.shiftKey) {
@@ -134,6 +134,9 @@
             });
 
             $('#chatContainer').append("<div class=\"notify\">" + "이전 채팅내용 끝 지점입니다." + "</div>");
+
+            //하단으로 스크롤
+            $('#chatContainer').scrollTop($('#chatContainer')[0].scrollHeight);
         }
 
         //서버로부터 받은 내용 출력
@@ -191,7 +194,8 @@
         function getNotificationPermission() {
             //브라우저 지원 여부 체크
             if (!("Notification" in window)) {
-                console.log("데스크톱 알림을 지원하지 않는 브라우저입니다.");
+                alert("데스크톱 알림을 지원하지 않는 브라우저입니다.");
+                return;
             }
             //알림 권한 요청
             Notification.requestPermission((result) => {
