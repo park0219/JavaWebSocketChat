@@ -119,19 +119,21 @@ public class WebSocketChat {
         HttpSession httpSession = (HttpSession) config.getUserProperties().get(WebSocketConfigurator.Session);
 
         if(httpSession != null) {
-            log.info("Session " + session.getId() + "(" + httpSession.getAttribute("nickname") + ")" + " has closed");
+            String nickname = httpSession.getAttribute("nickname").toString();
+
+            log.info("Session " + session.getId() + "(" + nickname + ")" + " has closed");
 
             //DB에 저장
             ChatEntity chat = ChatEntity.builder()
                     .chatType('2')
-                    .chatMessage(httpSession.getAttribute("nickname") + "님이 나갔습니다")
+                    .chatMessage(nickname + "님이 나갔습니다")
                     .nickname("관리자")
                     .ip(httpSession.getAttribute("ip").toString())
                     .chatRegdate(LocalDateTime.now())
                     .build();
             chatRepository.save(chat);
 
-            returnMap.put("message", httpSession.getAttribute("nickname") + "님이 나갔습니다");
+            returnMap.put("message", nickname + "님이 나갔습니다");
             returnMap.put("returnCode", "3");
             sendAllSessionMessage(session, returnMap);
             httpSession.removeAttribute("nickname");
