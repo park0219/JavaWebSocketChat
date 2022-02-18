@@ -1,7 +1,9 @@
-package me.park.javawebsocketchat;
+package me.park.javawebsocketchat.chat;
 
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
+import me.park.javawebsocketchat.system.WebSocketConfigurator;
+import me.park.javawebsocketchat.model.ChatEntity;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpSession;

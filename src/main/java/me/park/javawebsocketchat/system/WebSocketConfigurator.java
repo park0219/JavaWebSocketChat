@@ -1,4 +1,4 @@
-package me.park.javawebsocketchat;
+package me.park.javawebsocketchat.system;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;

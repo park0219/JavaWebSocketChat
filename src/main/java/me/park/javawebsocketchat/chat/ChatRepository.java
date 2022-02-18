@@ -1,5 +1,6 @@
-package me.park.javawebsocketchat;
+package me.park.javawebsocketchat.chat;
 
+import me.park.javawebsocketchat.model.ChatEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

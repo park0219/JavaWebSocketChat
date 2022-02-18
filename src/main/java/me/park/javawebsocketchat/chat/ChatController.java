@@ -1,6 +1,8 @@
-package me.park.javawebsocketchat;
+package me.park.javawebsocketchat.chat;
 
 import com.google.gson.Gson;
+import me.park.javawebsocketchat.model.ChatEntity;
+import me.park.javawebsocketchat.model.Message;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;

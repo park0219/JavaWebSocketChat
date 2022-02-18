@@ -1,6 +1,7 @@
-package me.park.javawebsocketchat;
+package me.park.javawebsocketchat.login;
 
 import lombok.extern.slf4j.Slf4j;
+import me.park.javawebsocketchat.model.Message;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;

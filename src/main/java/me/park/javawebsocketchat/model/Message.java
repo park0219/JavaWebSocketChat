@@ -1,4 +1,4 @@
-package me.park.javawebsocketchat;
+package me.park.javawebsocketchat.model;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
